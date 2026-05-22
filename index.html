@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohan | Advanced Task Management Core</title>
+    <meta name="description" content="Professional web development portfolio and advanced task management application of Mohan, a 3rd year CSE student.">
+
+    <style>
+        /* ==========================================
+           1. FONTS & ULTRA-MODERN DARK/LIGHT THEME SYSTEM
+           ========================================== */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+        :root {
+            /* Default Advanced Dark Aesthetic */
+            --bg-body: #0f111a;
+            --bg-card: #161925;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-ui: #24293e;
+            --outline-focus: #bb9af3;
+            
+            /* Pastel Content Badges */
+            --pastel-purple: #251e3e;
+            --pastel-blue: #14283b;
+            --pastel-pink: #361d2e;
+            --pastel-yellow: #2d2a1e;
+            --pastel-green: #1b382b;
+            
+            /* Priority Indicators (Dark Mode) */
+            --priority-high: #ffe9e9;
+            --priority-high-bg: #4a1d1d;
+            --priority-med: #fff9db;
+            --priority-med-bg: #3a341c;
+            --priority-low: #e6f9f0;
+            --priority-low-bg: #163326;
+            
+            --accent-brand: #bb9af3;
+            --icon-color: #a9b1d6;
+        }
+
+        [data-theme="light"] {
+            /* Light Complement Alternative Theme */
+            --bg-body: #f7f9fc;
+            --bg-card: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #5a6578;
+            --border-ui: #e2e8f0;
+            --outline-focus: #6b46c1;
+            
+            --pastel-purple: #f3ebff;
+            --pastel-pink: #ffe9f3;
+            --pastel-blue: #e6f4fe;
+            --pastel-yellow: #fff9db;
+            --pastel-green: #e6f9f0;
+
+            /* Priority Indicators (Light Mode) */
+            --priority-high: #c53030;
+            --priority-high-bg: #ffe9e9;
+            --priority-med: #b7791f;
+            --priority-med-bg: #fff9db;
+            --priority-low: #22543d;
+            --priority-low-bg: #e6f9f0;
+            
+            --accent-brand: #6b46c1;
+            --icon-color: #4a5568;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 16px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        :focus {
+            outline: 3px solid var(--outline-focus);
+            outline-offset: 3px;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header, section, footer {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-ui);
+            border-radius: 24px;
+            padding: 24px;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background-color: var(--pastel-yellow);
+            border: 2px solid var(--border-ui);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-info h1 {
+            font-size: 2rem;
+            color: var(--accent-brand);
+            text-align: center;
+        }
+
+        /* ==========================================
+           2. TASK MANAGEMENT WORKSPACE SYSTEM STYLES
+           ========================================== */
+        .section-header-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--pastel-purple);
+        }
+
+        .stats-badge {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            background-color: var(--pastel-blue);
+            border-radius: 20px;
+            color: var(--text-main);
+            border: 1px solid var(--border-ui);
+        }
+
+        /* Fluid Progress Tracker Layout Component */
+        .progress-track {
+            background-color: var(--bg-body);
+            border-radius: 10px;
+            height: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-ui);
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--accent-brand), #3182ce);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Input Deck Configuration */
+        .todo-input-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input-bar input {
+            flex: 1;
+            padding: 14px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            border: 2px solid var(--border-ui);
+            border-radius: 14px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        .todo-input-bar select {
+            padding: 12px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            border: 2px solid var(--border-ui);
+            border-radius: 14px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .todo-input-bar button {
+            background-color: var(--pastel-purple);
+            color: var(--text-main);
+            border: 2px solid var(--border-ui);
+            padding: 14px 20px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+
+        .todo-input-bar button:hover {
+            border-color: var(--accent-brand);
+        }
+
+        /* Action Control Bar Layout */
+        .filter-controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border-ui);
+            padding-bottom: 16px;
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 2px solid transparent;
+            color: var(--text-muted);
+            padding: 6px 16px;
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--bg-body);
+        }
+
+        .filter-btn.active {
+            background-color: var(--pastel-purple);
+            color: var(--accent-brand);
+            border-color: var(--border-ui);
+        }
+
+        .bulk-clear-btn {
+            align-self: flex-start;
+            background-color: var(--pastel-pink);
+            border: 1px solid var(--border-ui);
+            color: var(--text-main);
+            padding: 6px 14px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .bulk-clear-btn:hover {
+            border-color: #e53e3e;
+        }
+
+        /* Data Render Card Structure */
+        .todo-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .todo-item {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background-color: var(--bg-body);
+            border: 2px solid var(--border-ui);
+            border-radius: 18px;
+            gap: 12px;
+        }
+
+        .todo-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .todo-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .todo-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            border: 2px solid var(--border-ui);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-card);
+            font-weight: 700;
+            color: var(--accent-brand);
+            flex-shrink: 0;
+        }
+
+        .todo-item.completed .todo-checkbox {
+            background-color: var(--pastel-green);
+            border-color: var(--accent-brand);
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .todo-text {
+            font-weight: 600;
+            font-size: 1.05rem;
+            word-break: break-all;
+            color: var(--text-main);
+        }
+
+        /* Localized Component Badges for Metadata */
+        .todo-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            border-top: 1px dashed var(--border-ui);
+            padding-top: 10px;
+        }
+
+        .priority-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Priority Layout Configuration Classes */
+        .priority-high { color: var(--priority-high); background-color: var(--priority-high-bg); }
+        .priority-medium { color: var(--priority-med); background-color: var(--priority-med-bg); }
+        .priority-low { color: var(--priority-low); background-color: var(--priority-low-bg); }
+
+        .todo-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid var(--border-ui);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .edit-btn { background-color: var(--pastel-blue); }
+        .delete-btn { background-color: var(--pastel-pink); }
+        
+        .action-btn:hover {
+            border-color: var(--accent-brand);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================
+           3. ADVANCED BREAKPOINT MQ RESPONSIVENESS
+           ========================================== */
+        @media (min-width: 600px) {
+            .todo-input-bar {
+                flex-direction: row;
+            }
+            .todo-input-bar select {
+                width: 130px;
+            }
+            .filter-controls-wrapper {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .bulk-clear-btn {
+                align-self: auto;
+            }
+            .todo-item {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .todo-meta-row {
+                width: auto;
+                border-top: none;
+                padding-top: 0;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="sr-only">Skip to main content</a>
+
+    <div class="app-container">
+
+        <header role="banner">
+            <button class="theme-toggle-btn" id="theme-switcher" aria-label="Toggle layout color scheme" type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--icon-color);"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+            </button>
+            <div class="header-info">
+                <h1>Mohan</h1>
+                <p>3rd Year CSE State Management & Metrics Core</p>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <section id="todo-app" aria-label="Task Management Application Workspace">
+                
+                <div class="section-header-group">
+                    <div class="title-area">
+                        <div class="section-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-brand);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </div>
+                        <h2>Quest Log Tracker</h2>
+                    </div>
+                    <div class="stats-badge" id="todo-stats" aria-live="polite">0 / 0 Completed</div>
+                </div>
+
+                <div class="progress-track">
+                    <div class="progress-bar-fill" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+
+                <form id="todo-form" class="todo-input-bar" aria-label="Add a new task item">
+                    <input type="text" id="todo-input" placeholder="Enter a task description..." required autocomplete="off" aria-label="New task content field">
+                    
+                    <select id="todo-priority" aria-label="Assign Task Priority Level">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                    
+                    <button type="submit">Add Quest</button>
+                </form>
+
+                <div class="filter-controls-wrapper">
+                    <div class="filter-controls" role="group" aria-label="Filter quests by operational state">
+                        <button type="button" class="filter-btn active" data-filter="all">All</button>
+                        <button type="button" class="filter-btn" data-filter="active">Active</button>
+                        <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+                    
+                    <button type="button" id="clear-completed-btn" class="bulk-clear-btn" aria-label="Clear all completed tasks instantly">Purge Completed</button>
+                </div>
+
+                <ul id="todo-list" class="todo-list" aria-label="Current operational items">
+                    </ul>
+            </section>
+        </main>
+
+        <footer role="contentinfo">
+            <p>&copy; 2026 Mohan. Client-Side Persistent Architecture.</p>
+        </footer>
+    </div>
+
+    <script>
+        /* Array Memory Object Space Hook */
+        let todos = JSON.parse(localStorage.getItem('todos-v2')) || [];
+        let currentFilter = 'all';
+
+        /* Element Object DOM Bindings */
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoPriority = document.getElementById('todo-priority');
+        const todoListUl = document.getElementById('todo-list');
+        const todoStats = document.getElementById('todo-stats');
+        const progressBarFill = document.getElementById('progress-bar');
+        const filterContainer = document.querySelector('.filter-controls');
+        const clearCompletedBtn = document.getElementById('clear-completed-btn');
+        const themeBtn = document.getElementById('theme-switcher');
+
+        /* ------------------------------------------
+           COMPILATION DATA PROCESSOR & RENDERING ENGINE
+           ------------------------------------------ */
+        function saveAndRender() {
+            // Persist the state collection to localized string tokens
+            localStorage.setItem('todos-v2', JSON.stringify(todos));
+            
+            // Clean dynamic render boundaries
+            todoListUl.innerHTML = '';
+            
+            // Execute filter maps
+            const filteredTodos = todos.filter(todo => {
+                if (currentFilter === 'active') return !todo.completed;
+                if (currentFilter === 'completed') return todo.completed;
+                return true;
+            });
+
+            if (filteredTodos.length === 0) {
+                todoListUl.innerHTML = `<li class="empty-state">No items found in this category!</li>`;
+            } else {
+                filteredTodos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                    li.setAttribute('data-id', todo.id);
+                    
+                    li.innerHTML = `
+                        <div class="todo-item-left">
+                            <button type="button" class="todo-checkbox" aria-label="Toggle execution mapping state for ${todo.text}">
+                                ${todo.completed ? '✓' : ''}
+                            </button>
+                            <span class="todo-text">${todo.text}</span>
+                        </div>
+                        <div class="todo-meta-row">
+                            <span class="priority-tag priority-${todo.priority}">${todo.priority}</span>
+                            <div class="todo-actions">
+                                <button type="button" class="action-btn edit-btn" aria-label="Modify description text">Edit</button>
+                                <button type="button" class="action-btn delete-btn" aria-label="Erase node permanently">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    todoListUl.appendChild(li);
+                });
+            }
+
+            // Calculate Running Progress Metrics
+            const totalCount = todos.length;
+            const completedCount = todos.filter(t => t.completed).length;
+            todoStats.textContent = `${completedCount} / ${totalCount} Completed`;
+
+            // Calculate Progress Bar Width Percentage
+            const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+            progressBarFill.style.width = `${progressPercentage}%`;
+            progressBarFill.setAttribute('aria-valuenow', Math.round(progressPercentage));
+        }
+
+        /* ------------------------------------------
+           CRUD LOGIC PROCESS ACTIONS
+           ------------------------------------------ */
+        
+        // 1. CREATE Operation
+        todoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const textValue = todoInput.value.trim();
+            if (!textValue) return;
+
+            const newTodo = {
+                id: Date.now().toString(),
+                text: textValue,
+                priority: todoPriority.value,
+                completed: false
+            };
+
+            todos.push(newTodo);
+            todoInput.value = '';
+            todoPriority.value = 'medium'; // Resets priority drop configuration defaults
+            saveAndRender();
+        });
+
+        // 2, 3, 4. READ / UPDATE / DELETE Handled Via Single Event Observer Mapping Node
+        todoListUl.addEventListener('click', (e) => {
+            const target = e.target;
+            const itemElement = target.closest('.todo-item');
+            if (!itemElement) return;
+            
+            const todoId = itemElement.getAttribute('data-id');
+            const targetTodo = todos.find(t => t.id === todoId);
+
+            // Toggle Checked Execution Flag
+            if (target.classList.contains('todo-checkbox') || target.closest('.todo-checkbox')) {
+                targetTodo.completed = !targetTodo.completed;
+                saveAndRender();
+                return;
+            }
+
+            // UPDATE Operation Trigger Link
+            if (target.classList.contains('edit-btn')) {
+                const newText = prompt("Modify item content description:", targetTodo.text);
+                if (newText !== null && newText.trim() !== "") {
+                    targetTodo.text = newText.trim();
+                    saveAndRender();
+                }
+                return;
+            }
+
+            // DELETE Operation Trigger Link
+            if (target.classList.contains('delete-btn')) {
+                todos = todos.filter(t => t.id !== todoId);
+                saveAndRender();
+                return;
+            }
+        });
+
+        // Bulk Clear Action Event Executor Hook
+        clearCompletedBtn.addEventListener('click', () => {
+            todos = todos.filter(todo => !todo.completed);
+            saveAndRender();
+        });
+
+        // UI filter button tracker mapping logic 
+        filterContainer.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('filter-btn')) return;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            currentFilter = e.target.getAttribute('data-filter');
+            saveAndRender();
+        });
+
+        /* ------------------------------------------
+           INDEPENDENT UI RENDERING THEME ROUTINE
+           ------------------------------------------ */
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        themeBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Start initialization sequence
+        saveAndRender();
+    </script>
+</body>
+</html>
